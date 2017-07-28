@@ -1,0 +1,30 @@
+{
+    "name": "yii2tech/content",
+    "description": "Content management system for Yii2",
+    "keywords": ["yii2", "content", "management", "text"],
+    "type": "yii2-extension",
+    "license": "BSD-3-Clause",
+    "support": {
+        "issues": "https://github.com/yii2tech/content/issues",
+        "forum": "http://www.yiiframework.com/forum/",
+        "wiki": "https://github.com/yii2tech/content/wiki",
+        "source": "https://github.com/yii2tech/content"
+    },
+    "authors": [
+        {
+            "name": "Paul Klimov",
+            "email": "klimov.paul@gmail.com"
+        }
+    ],
+    "require": {
+        "yiisoft/yii2": "*"
+    },
+    "autoload": {
+        "psr-4": { "yii2tech\\content\\": "" }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    }
+}
