@@ -3,9 +3,50 @@
 namespace yii2tech\tests\unit\content;
 
 use yii2tech\content\Item;
+use yii2tech\content\Manager;
+use yii2tech\content\PhpStorage;
+use yii2tech\content\PlaceholderRenderer;
 
 class ItemTest extends TestCase
 {
+    /**
+     * @return Manager test manager instance.
+     */
+    protected function createManager()
+    {
+        return new Manager([
+            'sourceStorage' => [
+                'class' => PhpStorage::className(),
+                'filePath' => $this->getTestFilePath() . DIRECTORY_SEPARATOR . 'source'
+            ],
+            'overrideStorage' => [
+                'class' => PhpStorage::className(),
+                'filePath' => $this->getTestFilePath() . DIRECTORY_SEPARATOR . 'override'
+            ],
+            'renderer' => [
+                'class' => PlaceholderRenderer::className(),
+            ],
+        ]);
+    }
+
+    /**
+     * @param Manager $manager
+     */
+    protected function createTestSource(Manager $manager)
+    {
+        $storage = $manager->getSourceStorage();
+        $storage->save('item1', [
+            'title' => 'Item 1',
+            'body' => 'Item1 {name} body',
+        ]);
+        $storage->save('item2', [
+            'title' => 'Item 2',
+            'body' => 'Item2 {name} body',
+        ]);
+    }
+
+    // Tests :
+
     public function testSetupContents()
     {
         $item = new Item();
@@ -83,5 +124,65 @@ class ItemTest extends TestCase
         ];
         $item->setContents($contents);
         $this->assertTrue($item->validate());
+    }
+
+    /**
+     * @depends testSetupContents
+     */
+    public function testRender()
+    {
+        $manager = $this->createManager();
+        $this->createTestSource($manager);
+
+        $item = $manager->get('item1');
+
+        $this->assertEquals('Item1 foo body', $item->render('body', ['name' => 'foo']));
+    }
+
+    /**
+     * @depends testSetupContents
+     */
+    public function testSave()
+    {
+        $manager = $this->createManager();
+        $this->createTestSource($manager);
+
+        $item = $manager->get('item1');
+
+        $item->setContents([
+            'title' => 'override title',
+            'body' => 'override body',
+        ]);
+        $item->save(false);
+
+        $refreshedItem = $manager->get('item1');
+
+        $this->assertEquals($item->getContents(), $refreshedItem->getContents());
+    }
+
+    /**
+     * @depends testSave
+     */
+    public function testReset()
+    {
+        $manager = $this->createManager();
+        $this->createTestSource($manager);
+
+        $item = $manager->get('item1');
+
+        $item->setContents([
+            'title' => 'override title',
+            'body' => 'override body',
+        ]);
+        $item->save(false);
+
+        $item->reset(false);
+
+        $refreshedItem = $manager->get('item1');
+
+        $this->assertNotEquals($item->getContents(), $refreshedItem->getContents());
+
+        $item->reset(true);
+        $this->assertEquals($item->getContents(), $refreshedItem->getContents());
     }
 }

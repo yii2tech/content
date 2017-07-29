@@ -117,6 +117,34 @@ class Item extends Model
         return $this->manager->getRenderer()->render($this->get($id), $data);
     }
 
+    /**
+     * Saves this item data, creating an override.
+     * @param bool $runValidation whether to perform validation (calling [[validate()]])
+     * before saving the item. Defaults to `true`.
+     * @return bool whether the saving succeeded (i.e. no validation errors occurred).
+     */
+    public function save($runValidation = true)
+    {
+        if ($runValidation && !$this->validate()) {
+            return false;
+        }
+        $this->getManager()->save($this->getId(), $this->getContents());
+        return true;
+    }
+
+    /**
+     * Resets own content, removing its overridden value.
+     * @param bool $refresh whether to refresh this item contents after reset is done. Defaults to `true`.
+     */
+    public function reset($refresh = true)
+    {
+        $this->getManager()->reset($this->getId());
+        if ($refresh) {
+            $refreshItem = $this->getManager()->get($this->getId());
+            $this->setContents($refreshItem->getContents());
+        }
+    }
+
     // Model specifics :
 
     /**
