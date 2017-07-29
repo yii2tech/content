@@ -28,6 +28,14 @@ class Manager extends Component
      * @var array|\Closure configuration for the content item creation.
      */
     public $itemConfig = ['class' => 'yii2tech\content\Item'];
+    /**
+     * @var string[] list of content parts, which are used to store meta data, which should not
+     * be overridden. Meta data content parts can be used to store comments for content set,
+     * description for placeholders and so on.
+     * These content parts will not be returned by [[get()]] or [[getAll()]], use [[getMetaData()]]
+     * to retrieve them.
+     */
+    public $metaDataContentParts = [];
 
     /**
      * @var RendererInterface|array|\Closure content parser.
@@ -154,6 +162,26 @@ class Manager extends Component
     }
 
     /**
+     * Returns the content item meta data from the [[sourceStorage]] according to [[metaDataContentParts]].
+     * @param string $id content ID.
+     * @return array meta data.
+     */
+    public function getMetaData($id)
+    {
+        if (empty($this->metaDataContentParts)) {
+            return [];
+        }
+        $data = $this->getSourceStorage()->find($id);
+        $metaData = [];
+        foreach ($data as $key => $value) {
+            if (in_array($key, $this->metaDataContentParts, true)) {
+                $metaData[$key] = $value;
+            }
+        }
+        return $metaData;
+    }
+
+    /**
      * Creates new content item instance.
      * @param string $id item ID.
      * @param array $contents item content parts.
@@ -166,6 +194,13 @@ class Manager extends Component
         $item = Yii::createObject($this->itemConfig);
         $item->setManager($this);
         $item->setId($id);
+
+        foreach ($this->metaDataContentParts as $contentPartName) {
+            if (isset($contents[$contentPartName])) {
+                unset($contents[$contentPartName]);
+            }
+        }
+
         $item->setContents($contents);
         return $item;
     }

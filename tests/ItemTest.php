@@ -185,4 +185,20 @@ class ItemTest extends TestCase
         $item->reset(true);
         $this->assertEquals($item->getContents(), $refreshedItem->getContents());
     }
+
+    /**
+     * @depends testSetupContents
+     */
+    public function testMetaData()
+    {
+        $manager = $this->createManager();
+        $this->createTestSource($manager);
+        $manager->metaDataContentParts = ['body'];
+
+        $item = $manager->get('item1');
+
+        $this->assertFalse($item->has('body'));
+
+        $this->assertEquals(['body' => 'Item1 {name} body'], $item->getMetaData());
+    }
 }

@@ -17,6 +17,7 @@ use yii\base\Model;
  * @property Manager $manager related content manager reference.
  * @property string $id this item ID.
  * @property array $contents content parts in format: `[id => content]`.
+ * @property array $metaData  meta data associated with this item.
  *
  * @author Paul Klimov <klimov.paul@gmail.com>
  * @since 1.0
@@ -35,6 +36,10 @@ class Item extends Model
      * @var array related contents in format: `[id => content]`.
      */
     private $_contents = [];
+    /**
+     * @var array meta data associated with this item.
+     */
+    private $_metaData;
 
 
     /**
@@ -83,6 +88,25 @@ class Item extends Model
     public function setContents(array $contents)
     {
         $this->_contents = $contents;
+    }
+
+    /**
+     * @return array meta data associated with this item.
+     */
+    public function getMetaData()
+    {
+        if ($this->_metaData === null) {
+            $this->_metaData = $this->getManager()->getMetaData($this->getId());
+        }
+        return $this->_metaData;
+    }
+
+    /**
+     * @param array $metaData meta data associated with this item.
+     */
+    public function setMetaData($metaData)
+    {
+        $this->_metaData = $metaData;
     }
 
     /**

@@ -76,6 +76,10 @@ class JsonStorage extends Component implements StorageInterface
     public function findAll()
     {
         $path = Yii::getAlias($this->filePath);
+        if (!file_exists($path)) {
+            return [];
+        }
+
         $files = FileHelper::findFiles($path, [
             'only' => ['*.json']
         ]);

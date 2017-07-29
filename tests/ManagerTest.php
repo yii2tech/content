@@ -33,10 +33,12 @@ class ManagerTest extends TestCase
     {
         $storage = $manager->getSourceStorage();
         $storage->save('item1', [
-            'title' => 'Item 1'
+            'title' => 'Item 1',
+            'body' => 'Item 1 Body',
         ]);
         $storage->save('item2', [
-            'title' => 'Item 2'
+            'title' => 'Item 2',
+            'body' => 'Item 2 Body',
         ]);
     }
 
@@ -92,6 +94,7 @@ class ManagerTest extends TestCase
         $this->assertEquals('item1', $item->getId());
         $this->assertSame($manager, $item->getManager());
         $this->assertEquals('Item 1', $item->get('title'));
+        $this->assertEquals('Item 1 Body', $item->get('body'));
 
         $this->expectException('yii\base\InvalidParamException');
         $manager->get('un-existing');
@@ -134,7 +137,7 @@ class ManagerTest extends TestCase
     /**
      * @depends testSave
      */
-    public function testFindAll()
+    public function testGetAll()
     {
         $manager = $this->createManager();
         $this->createTestSource($manager);
@@ -148,5 +151,24 @@ class ManagerTest extends TestCase
         $this->assertTrue(isset($items['item1'], $items['item2']));
         $this->assertEquals('override', $items['item1']->get('title'));
         $this->assertEquals('Item 2', $items['item2']->get('title'));
+    }
+
+    /**
+     * @depends testGetAll
+     */
+    public function testMetaData()
+    {
+        $manager = $this->createManager();
+        $this->createTestSource($manager);
+
+        $manager->metaDataContentParts = ['body'];
+        $item = $manager->get('item1');
+
+        $this->assertFalse($item->has('body'));
+
+        $items = $manager->getAll();
+        $this->assertFalse($items['item1']->has('body'));
+
+        $this->assertEquals(['body' => 'Item 1 Body'], $manager->getMetaData('item1'));
     }
 }
