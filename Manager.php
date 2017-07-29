@@ -15,7 +15,7 @@ use yii\di\Instance;
 /**
  * Manager
  *
- * @property ParserInterface|array|\Closure $parser content parser.
+ * @property RendererInterface|array|\Closure $renderer content renderer.
  * @property StorageInterface|array|\Closure $sourceStorage source content storage.
  * @property StorageInterface|array|\Closure $overrideStorage override content storage.
  *
@@ -30,9 +30,9 @@ class Manager extends Component
     public $itemConfig = ['class' => 'yii2tech\content\Item'];
 
     /**
-     * @var ParserInterface|array|\Closure content parser.
+     * @var RendererInterface|array|\Closure content parser.
      */
-    private $_parser = ['class' => 'yii2tech\content\SimpleParser'];
+    private $_renderer = ['class' => 'yii2tech\content\PlaceholderRenderer'];
     /**
      * @var StorageInterface|array|\Closure source content storage.
      */
@@ -44,22 +44,22 @@ class Manager extends Component
 
 
     /**
-     * @return ParserInterface parser instance.
+     * @return RendererInterface renderer instance.
      */
-    public function getParser()
+    public function getRenderer()
     {
-        if (!is_object($this->_parser) || $this->_parser instanceof \Closure) {
-            $this->_parser = Instance::ensure($this->_parser, 'yii2tech\content\ParserInterface');
+        if (!is_object($this->_renderer) || $this->_renderer instanceof \Closure) {
+            $this->_renderer = Instance::ensure($this->_renderer, 'yii2tech\content\RendererInterface');
         }
-        return $this->_parser;
+        return $this->_renderer;
     }
 
     /**
-     * @param ParserInterface|array|\Closure $parser parser instance or its DI compatible configuration.
+     * @param RendererInterface|array|\Closure $renderer renderer instance or its DI compatible configuration.
      */
-    public function setParser($parser)
+    public function setRenderer($renderer)
     {
-        $this->_parser = $parser;
+        $this->_renderer = $renderer;
     }
 
     /**

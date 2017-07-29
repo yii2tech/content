@@ -107,14 +107,14 @@ class Item extends Model
     }
 
     /**
-     * Parses specified content part.
+     * Renders specified content part.
      * @param string $id content part ID.
-     * @param array $data parsing data.
+     * @param array $data content data.
      * @return string parsed content.
      */
-    public function parse($id, array $data = [])
+    public function render($id, array $data = [])
     {
-        return $this->manager->getParser()->parse($this->get($id), $data);
+        return $this->manager->getRenderer()->render($this->get($id), $data);
     }
 
     // Model specifics :

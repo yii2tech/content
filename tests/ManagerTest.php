@@ -5,7 +5,7 @@ namespace yii2tech\tests\unit\content;
 use yii2tech\content\Item;
 use yii2tech\content\Manager;
 use yii2tech\content\PhpStorage;
-use yii2tech\content\SimpleParser;
+use yii2tech\content\PlaceholderRenderer;
 
 class ManagerTest extends TestCase
 {
@@ -42,16 +42,16 @@ class ManagerTest extends TestCase
 
     // Tests :
 
-    public function testSetupParser()
+    public function testSetupRenderer()
     {
         $manager = new Manager();
 
-        $manager->setParser(['class' => SimpleParser::className()]);
-        $this->assertTrue($manager->getParser() instanceof SimpleParser);
+        $manager->setRenderer(['class' => PlaceholderRenderer::className()]);
+        $this->assertTrue($manager->getRenderer() instanceof PlaceholderRenderer);
 
-        $parser = new SimpleParser();
-        $manager->setParser($parser);
-        $this->assertSame($parser, $manager->getParser());
+        $renderer = new PlaceholderRenderer();
+        $manager->setRenderer($renderer);
+        $this->assertSame($renderer, $manager->getRenderer());
     }
 
     public function testSetupSourceStorage()

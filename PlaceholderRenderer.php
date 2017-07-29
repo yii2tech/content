@@ -10,17 +10,17 @@ namespace yii2tech\content;
 use yii\base\Component;
 
 /**
- * SimpleParser
+ * PlaceholderRenderer
  *
  * @author Paul Klimov <klimov.paul@gmail.com>
  * @since 1.0
  */
-class SimpleParser extends Component implements ParserInterface
+class PlaceholderRenderer extends Component implements RendererInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function parse($content, array $data)
+    public function render($content, array $data)
     {
         $replacePairs = [];
         foreach ($data as $name => $value) {

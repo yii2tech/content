@@ -2,9 +2,9 @@
 
 namespace yii2tech\tests\unit\content;
 
-use yii2tech\content\SimpleParser;
+use yii2tech\content\PlaceholderRenderer;
 
-class SimpleParserTest extends TestCase
+class PlaceholderRendererTest extends TestCase
 {
     /**
      * Data provider for [[testParse()]].
@@ -32,7 +32,7 @@ class SimpleParserTest extends TestCase
      */
     public function testParse($content, $data, $expectedResult)
     {
-        $parser = new SimpleParser();
-        $this->assertEquals($expectedResult, $parser->parse($content, $data));
+        $parser = new PlaceholderRenderer();
+        $this->assertEquals($expectedResult, $parser->render($content, $data));
     }
 }

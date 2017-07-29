@@ -8,18 +8,18 @@
 namespace yii2tech\content;
 
 /**
- * ParserInterface
+ * RendererInterface
  *
  * @author Paul Klimov <klimov.paul@gmail.com>
  * @since 1.0
  */
-interface ParserInterface
+interface RendererInterface
 {
     /**
-     * Parses given content applying particular data.
-     * @param string $content raw content to be parsed.
+     * Renders given content applying particular data.
+     * @param string $content raw content to be rendered.
      * @param array $data content data in format: `[name => value]`
-     * @return string parsed content
+     * @return string rendered content.
      */
-    public function parse($content, array $data);
+    public function render($content, array $data);
 }
