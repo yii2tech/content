@@ -34,10 +34,13 @@ class PhpStorage extends Component implements StorageInterface
     public function save($id, array $data)
     {
         $fileName = $this->composeFileName($id);
+        $content = "<?php\n\nreturn " . VarDumper::export($data) . ";";
+
         if (file_exists($fileName)) {
             unlink($fileName);
         }
-        $content = "<?php\n\nreturn " . VarDumper::export($data) . ";";
+        FileHelper::createDirectory(dirname($fileName));
+
         $bytesWritten = file_put_contents($fileName, $content);
         if ($bytesWritten <= 0) {
             throw new Exception("Unable to write file '{$fileName}'.");
@@ -88,7 +91,8 @@ class PhpStorage extends Component implements StorageInterface
      */
     protected function composeFileName($id)
     {
-        return $this->resolveFilePath() . DIRECTORY_SEPARATOR . $id . '.php';
+        $id = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $id);
+        return Yii::getAlias($this->filePath) . DIRECTORY_SEPARATOR . $id . '.php';
     }
 
     /**

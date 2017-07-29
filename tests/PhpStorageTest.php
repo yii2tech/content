@@ -60,4 +60,21 @@ class PhpStorageTest extends TestCase
 
         $this->assertNull($storage->find('test-delete'));
     }
+
+    /**
+     * @depends testFind
+     */
+    public function testSaveSubDir()
+    {
+        $storage = new PhpStorage();
+        $storage->filePath = $this->getTestFilePath();
+
+        $data = [
+            'title' => 'Some Title',
+            'body' => 'Some Body',
+        ];
+        $storage->save('test/sub-dir', $data);
+
+        $this->assertEquals($data, $storage->find('test/sub-dir'));
+    }
 }
