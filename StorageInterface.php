@@ -8,7 +8,7 @@
 namespace yii2tech\content;
 
 /**
- * StorageInterface
+ * StorageInterface is the interface that must be implemented by content storage classes.
  *
  * @author Paul Klimov <klimov.paul@gmail.com>
  * @since 1.0

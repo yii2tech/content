@@ -11,15 +11,15 @@ use Yii;
 use yii\base\Component;
 use yii\base\Exception;
 use yii\helpers\FileHelper;
-use yii\helpers\VarDumper;
+use yii\helpers\Json;
 
 /**
- * PhpStorage performs data storage inside PHP code files.
+ * JsonStorage performs data storage inside local files in JSON format.
  *
  * @author Paul Klimov <klimov.paul@gmail.com>
  * @since 1.0
  */
-class PhpStorage extends Component implements StorageInterface
+class JsonStorage extends Component implements StorageInterface
 {
     /**
      * @var string file path to save data files.
@@ -34,7 +34,7 @@ class PhpStorage extends Component implements StorageInterface
     public function save($id, array $data)
     {
         $fileName = $this->composeFileName($id);
-        $content = "<?php\n\nreturn " . VarDumper::export($data) . ";";
+        $content = Json::encode($data);
 
         if (file_exists($fileName)) {
             unlink($fileName);
@@ -46,7 +46,6 @@ class PhpStorage extends Component implements StorageInterface
         if ($bytesWritten <= 0) {
             throw new Exception("Unable to write file '{$fileName}'.");
         }
-        $this->invalidateScriptCache($fileName);
     }
 
     /**
@@ -58,7 +57,7 @@ class PhpStorage extends Component implements StorageInterface
         if (!file_exists($fileName)) {
             return null;
         }
-        return require $fileName;
+        return Json::decode(file_get_contents($fileName));
     }
 
     /**
@@ -68,12 +67,12 @@ class PhpStorage extends Component implements StorageInterface
     {
         $path = Yii::getAlias($this->filePath);
         $files = FileHelper::findFiles($path, [
-            'only' => ['*.php']
+            'only' => ['*.json']
         ]);
         $items = [];
         foreach ($files as $file) {
-            $id = substr($file, strlen($path) + 1, -4);
-            $items[$id] = require $file;
+            $id = substr($file, strlen($path) + 1, -5);
+            $items[$id] = Json::decode(file_get_contents($file));
         }
         return $items;
     }
@@ -86,7 +85,6 @@ class PhpStorage extends Component implements StorageInterface
         $fileName = $this->composeFileName($id);
         if (file_exists($fileName)) {
             unlink($fileName);
-            $this->invalidateScriptCache($fileName);
         }
     }
 
@@ -98,20 +96,6 @@ class PhpStorage extends Component implements StorageInterface
     protected function composeFileName($id)
     {
         $id = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $id);
-        return Yii::getAlias($this->filePath) . DIRECTORY_SEPARATOR . $id . '.php';
-    }
-
-    /**
-     * Invalidates pre-compiled script cache (such as OPCache or APC) for the given file.
-     * @param string $fileName file name.
-     */
-    protected function invalidateScriptCache($fileName)
-    {
-        if (function_exists('opcache_invalidate')) {
-            opcache_invalidate($fileName, true);
-        }
-        if (function_exists('apc_delete_file')) {
-            @apc_delete_file($fileName);
-        }
+        return Yii::getAlias($this->filePath) . DIRECTORY_SEPARATOR . $id . '.json';
     }
 }
