@@ -82,18 +82,22 @@ abstract class AbstractStorageTest extends TestCase
         $storage = $this->createStorage();
 
         $storage->save('item1', [
-            'title' => 'item1',
+            'title' => 'title1',
+            'body' => 'body1',
         ]);
         $storage->save('item2', [
-            'title' => 'item2',
+            'title' => 'title2',
+            'body' => 'body2',
         ]);
 
         $expectedAll = [
             'item1' => [
-                'title' => 'item1',
+                'title' => 'title1',
+                'body' => 'body1',
             ],
             'item2' => [
-                'title' => 'item2',
+                'title' => 'title2',
+                'body' => 'body2',
             ],
         ];
         $this->assertEquals($expectedAll, $storage->findAll());

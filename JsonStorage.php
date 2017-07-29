@@ -15,6 +15,16 @@ use yii\helpers\Json;
 
 /**
  * JsonStorage performs data storage inside local files in JSON format.
+ * Files are stored under [[filePath]]. Each particular content record represented by separated file,
+ * which should hold JSON for content parts.
+ * For example:
+ *
+ * ```json
+ * {
+ *     "title": "About",
+ *     "body": "About page content"
+ * }
+ * ```
  *
  * @author Paul Klimov <klimov.paul@gmail.com>
  * @since 1.0

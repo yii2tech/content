@@ -15,6 +15,18 @@ use yii\helpers\VarDumper;
 
 /**
  * PhpStorage performs data storage inside PHP code files.
+ * Files are stored under [[filePath]]. Each particular content record represented by separated file,
+ * which should return array of content parts.
+ * For example:
+ *
+ * ```php
+ * <?php
+ *
+ * return [
+ *     'title' => 'About',
+ *     'body' => 'About page content',
+ * ];
+ * ```
  *
  * @author Paul Klimov <klimov.paul@gmail.com>
  * @since 1.0

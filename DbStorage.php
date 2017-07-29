@@ -13,15 +13,40 @@ use yii\db\Query;
 use yii\di\Instance;
 
 /**
- * DbStorage
+ * DbStorage represents the content storage based on database table.
+ * Example migration for such table:
  *
- * @property string $idColumnName name of the table column, which should store content ID.
+ * ```php
+ * $tableName = 'Page';
+ * $columns = [
+ *     'id' => 'string',
+ *     'title' => 'string',
+ *     'body' => 'text',
+ *     'PRIMARY KEY(id)',
+ * ];
+ * $this->createTable($tableName, $columns);
+ * ```
+ *
+ * Configuration example:
+ *
+ * ```php
+ * [
+ *     'class' => 'yii2tech\content\DbStorage',
+ *     'table' => '{{%Page}}',
+ *     'contentAttributes' => [
+ *         'title',
+ *         'body',
+ *     ],
+ * ]
+ * ```
  *
  * @author Paul Klimov <klimov.paul@gmail.com>
  * @since 1.0
  */
 class DbStorage extends Component implements StorageInterface
 {
+    use StorageFilterTrait;
+
     /**
      * @var Connection|array|string the DB connection object or the application component ID of the DB connection.
      * After the storage object is created, if you want to change this property, you should only assign it
@@ -31,33 +56,16 @@ class DbStorage extends Component implements StorageInterface
     /**
      * @var string string name of the DB table to store content data.
      */
-    public $table = '{{%Content}}';
-
+    public $table;
     /**
      * @var string name of the table column, which should store content ID.
      */
-    private $_idColumnName;
-
-
+    public $idAttribute = 'id';
     /**
-     * @return string name of the table column, which should store content ID.
+     * @var string[] list of table columns, which should store content parts.
      */
-    public function getIdColumnName()
-    {
-        if ($this->_idColumnName === null) {
-            $primaryKeys = $this->db->getTableSchema($this->table)->primaryKey;
-            $this->_idColumnName = array_shift($primaryKeys);
-        }
-        return $this->_idColumnName;
-    }
+    public $contentAttributes = [];
 
-    /**
-     * @param string $idColumnName name of the table column, which should store content ID.
-     */
-    public function setIdColumnName($idColumnName)
-    {
-        $this->_idColumnName = $idColumnName;
-    }
 
     /**
      * {@inheritdoc}
@@ -76,18 +84,13 @@ class DbStorage extends Component implements StorageInterface
         $existingRow = $this->findRow($id);
 
         if ($existingRow === false) {
-            $data[$this->getIdColumnName()] = $id;
+            $data[$this->idAttribute] = $id;
             $this->db->createCommand()
-                ->insert($this->table, $data)
+                ->insert($this->table, $this->composeFilterAttributes($data))
                 ->execute();
         } else {
-            $primaryKeys = $this->db->getTableSchema($this->table)->primaryKey;
-            $condition = [];
-            foreach ($primaryKeys as $columnName) {
-                $condition[$columnName] = $existingRow[$columnName];
-            }
             $this->db->createCommand()
-                ->update($this->table, $data, $condition)
+                ->update($this->table, $data, $this->composeFilterAttributes([$this->idAttribute => $id]))
                 ->execute();
         }
     }
@@ -101,7 +104,7 @@ class DbStorage extends Component implements StorageInterface
         if ($row === false) {
             return null;
         }
-        unset($row[$this->getIdColumnName()]);
+        unset($row[$this->idAttribute]);
         return $row;
     }
 
@@ -110,7 +113,18 @@ class DbStorage extends Component implements StorageInterface
      */
     public function findAll()
     {
-        // TODO: Implement findAll() method.
+        $rows = (new Query())
+            ->select($this->idAttribute)
+            ->addSelect($this->contentAttributes)
+            ->from($this->table)
+            ->andWhere($this->composeFilterAttributes())
+            ->indexBy($this->idAttribute)
+            ->all($this->db);
+
+        foreach ($rows as &$row) {
+            unset($row[$this->idAttribute]);
+        }
+        return $rows;
     }
 
     /**
@@ -118,15 +132,21 @@ class DbStorage extends Component implements StorageInterface
      */
     public function delete($id)
     {
-        // TODO: Implement delete() method.
+        $this->db->createCommand()
+            ->delete($this->table, $this->composeFilterAttributes([$this->idAttribute => $id]))
+            ->execute();
     }
 
+    /**
+     * Finds database record for specified content ID.
+     * @param string $id content ID.
+     * @return array|false row data, `false` - if not found.
+     */
     protected function findRow($id)
     {
-        $row = (new Query())
+        return (new Query())
             ->from($this->table)
-            ->andWhere([$this->getIdColumnName() => $id])
-            ->one();
-        return $row;
+            ->andWhere($this->composeFilterAttributes([$this->idAttribute => $id]))
+            ->one($this->db);
     }
 }
