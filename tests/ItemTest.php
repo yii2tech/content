@@ -140,6 +140,30 @@ class ItemTest extends TestCase
     }
 
     /**
+     * @depends testRender
+     */
+    public function testRenderDefaultData()
+    {
+        $manager = $this->createManager();
+        $this->createTestSource($manager);
+
+        $item = $manager->get('item1');
+        $manager->defaultRenderData = [
+            'name' => 'default'
+        ];
+
+        $this->assertEquals('Item1 default body', $item->render('body'));
+        $this->assertEquals('Item1 override body', $item->render('body', ['name' => 'override']));
+
+        $manager->defaultRenderData = function () {
+            return [
+                'name' => 'callback'
+            ];
+        };
+        $this->assertEquals('Item1 callback body', $item->render('body'));
+    }
+
+    /**
      * @depends testSetupContents
      */
     public function testSave()

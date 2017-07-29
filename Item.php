@@ -138,7 +138,14 @@ class Item extends Model
      */
     public function render($id, array $data = [])
     {
-        return $this->manager->getRenderer()->render($this->get($id), $data);
+        $manager = $this->getManager();
+        if (!empty($manager->defaultRenderData)) {
+            $data = array_merge(
+                $manager->defaultRenderData instanceof \Closure ? call_user_func($manager->defaultRenderData) : $manager->defaultRenderData,
+                $data
+            );
+        }
+        return $manager->getRenderer()->render($this->get($id), $data);
     }
 
     /**

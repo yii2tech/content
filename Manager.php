@@ -29,6 +29,31 @@ class Manager extends Component
      */
     public $itemConfig = ['class' => 'yii2tech\content\Item'];
     /**
+     * @var array|callable default rendering data, which should be applied for each item rendering.
+     * For example:
+     *
+     * ```php
+     * [
+     *     'appName' => 'My Application',
+     *     'appEmail' => 'my.application@example.com',
+     * ]
+     * ```
+     *
+     * It can be specified as PHP callback, which should return actual render data, for example:
+     *
+     * ```php
+     * function () {
+     *     return [
+     *         'appName' => Yii::$app->name,
+     *         'baseUrl' => Yii::$app->request->baseUrl,
+     *     ];
+     * }
+     * ```
+     *
+     * @see Item::render()
+     */
+    public $defaultRenderData = [];
+    /**
      * @var string[] list of content parts, which are used to store meta data, which should not
      * be overridden. Meta data content parts can be used to store comments for content set,
      * description for placeholders and so on.
