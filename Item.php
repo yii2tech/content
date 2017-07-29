@@ -15,6 +15,7 @@ use yii\base\Model;
  * It consists of several content parts determined by [[contents]].
  *
  * @property Manager $manager related content manager reference.
+ * @property string $id this item ID.
  * @property array $contents content parts in format: `[id => content]`.
  *
  * @author Paul Klimov <klimov.paul@gmail.com>
@@ -26,6 +27,10 @@ class Item extends Model
      * @var Manager related content manager reference.
      */
     private $_manager;
+    /**
+     * @var string this item ID.
+     */
+    private $_id;
     /**
      * @var array related contents in format: `[id => content]`.
      */
@@ -46,6 +51,22 @@ class Item extends Model
     public function setManager($manager)
     {
         $this->_manager = $manager;
+    }
+
+    /**
+     * @return string this item ID
+     */
+    public function getId()
+    {
+        return $this->_id;
+    }
+
+    /**
+     * @param string $id this item ID
+     */
+    public function setId($id)
+    {
+        $this->_id = $id;
     }
 
     /**

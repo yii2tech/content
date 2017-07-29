@@ -114,20 +114,58 @@ class Manager extends Component
                 throw new InvalidParamException("Content item '{$id}' does not exist.");
             }
         }
-        return $this->createItem($data);
+        return $this->createItem($id, $data);
+    }
+
+    /**
+     * Returns all items present in the storage.
+     * @return Item[] list of content items indexed by their IDs
+     */
+    public function getAll()
+    {
+        $rows = array_merge(
+            $this->getSourceStorage()->findAll(),
+            $this->getOverrideStorage()->findAll()
+        );
+        $items = [];
+        foreach ($rows as $id => $data) {
+            $items[$id] = $this->createItem($id, $data);
+        }
+        return $items;
+    }
+
+    /**
+     * Resets the content for specified item, removing its override value.
+     * @param string $id content item ID.
+     */
+    public function reset($id)
+    {
+        $this->getOverrideStorage()->delete($id);
+    }
+
+    /**
+     * Saves new content item data, creating an override.
+     * @param string $id content item ID.
+     * @param array $data content item data.
+     */
+    public function save($id, array $data)
+    {
+        $this->getOverrideStorage()->save($id, $data);
     }
 
     /**
      * Creates new content item instance.
+     * @param string $id item ID.
      * @param array $contents item content parts.
      * @return Item content item instance.
      * @throws \yii\base\InvalidConfigException
      */
-    protected function createItem(array $contents)
+    protected function createItem($id, array $contents)
     {
         /* @var $item Item */
         $item = Yii::createObject($this->itemConfig);
         $item->setManager($this);
+        $item->setId($id);
         $item->setContents($contents);
         return $item;
     }
