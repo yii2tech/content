@@ -10,7 +10,13 @@ namespace yii2tech\content;
 use yii\base\Component;
 
 /**
- * PlaceholderRenderer
+ * PlaceholderRenderer performs content rendering via simple string placeholder replacement.
+ * Rendering data will be inserted into corresponding placeholders, marked by brackets (`{}`).
+ * For example:
+ *
+ * ```php
+ * echo $renderer->render('Hello, {name}', ['name' => 'John']); // outputs 'Hell, John'
+ * ```
  *
  * @author Paul Klimov <klimov.paul@gmail.com>
  * @since 1.0

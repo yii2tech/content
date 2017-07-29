@@ -8,7 +8,7 @@
 namespace yii2tech\content;
 
 /**
- * RendererInterface
+ * RendererInterface is the interface that must be implemented by content renderer classes.
  *
  * @author Paul Klimov <klimov.paul@gmail.com>
  * @since 1.0
