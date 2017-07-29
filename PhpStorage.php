@@ -63,6 +63,23 @@ class PhpStorage extends Component implements StorageInterface
     /**
      * {@inheritdoc}
      */
+    public function findAll()
+    {
+        $path = Yii::getAlias($this->filePath);
+        $files = FileHelper::findFiles($path, [
+            'only' => ['*.php']
+        ]);
+        $items = [];
+        foreach ($files as $file) {
+            $id = substr($file, strlen($path) + 1, -4);
+            $items[$id] = require $file;
+        }
+        return $items;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function delete($id)
     {
         $fileName = $this->composeFileName($id);

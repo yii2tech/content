@@ -77,4 +77,30 @@ class PhpStorageTest extends TestCase
 
         $this->assertEquals($data, $storage->find('test/sub-dir'));
     }
+
+    /**
+     * @depends testSave
+     */
+    public function testFindAll()
+    {
+        $storage = new PhpStorage();
+        $storage->filePath = $this->getTestFilePath();
+
+        $storage->save('item1', [
+            'title' => 'item1',
+        ]);
+        $storage->save('item2', [
+            'title' => 'item2',
+        ]);
+
+        $expectedAll = [
+            'item1' => [
+                'title' => 'item1',
+            ],
+            'item2' => [
+                'title' => 'item2',
+            ],
+        ];
+        $this->assertEquals($expectedAll, $storage->findAll());
+    }
 }

@@ -30,6 +30,12 @@ interface StorageInterface
     public function find($id);
 
     /**
+     * Finds all item data present in the storage.
+     * @return array[] content items, in format: `[itemID => data]`
+     */
+    public function findAll();
+
+    /**
      * Deletes data for particular content item.
      * @param string $id content item ID.
      */
