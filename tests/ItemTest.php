@@ -62,4 +62,26 @@ class ItemTest extends TestCase
         unset($item->title);
         $this->assertFalse(isset($item->title));
     }
+
+    /**
+     * @depends testAttributes
+     */
+    public function testValidate()
+    {
+        $item = new Item();
+
+        $contents = [
+            'title' => '',
+            'body' => '',
+        ];
+        $item->setContents($contents);
+        $this->assertFalse($item->validate());
+
+        $contents = [
+            'title' => 'some title',
+            'body' => 'some body',
+        ];
+        $item->setContents($contents);
+        $this->assertTrue($item->validate());
+    }
 }
