@@ -19,6 +19,9 @@
     "require": {
         "yiisoft/yii2": "*"
     },
+    "suggest": {
+        "mustache/mustache": "you need this package, if you wish to use `MustacheRenderer`"
+    },
     "repositories": [
         {
             "type": "composer",
