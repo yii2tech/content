@@ -78,7 +78,7 @@ return [
             ],
         ],
     ],
-    ...
+    // ...
 ];
 ```
 
@@ -173,8 +173,8 @@ return [
     'title' => 'About',
     'body' => <<<HTML
 <h1>About page content</h1>
-<img src="{appBaseUrl}/images/about.jpg">
-<a href="{appBaseUrl}">Home page</a>
+<img src="{{appBaseUrl}}/images/about.jpg">
+<a href="{{appBaseUrl}}">Home page</a>
 ...
 HTML
 ];

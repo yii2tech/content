@@ -14,11 +14,27 @@ class PlaceholderRendererTest extends TestCase
     {
         return [
             [
-                'Some {name} content',
+                'Some {{name}} content',
                 [
                     'name' => 'foo',
                 ],
                 'Some foo content',
+            ],
+            [
+                'Underscore {{underscore_name}} content',
+                [
+                    'underscore_name' => 'foo',
+                ],
+                'Underscore foo content',
+            ],
+            [
+                'Multi-level {{person.name}} content',
+                [
+                    'person' => [
+                        'name' => 'John'
+                    ],
+                ],
+                'Multi-level John content',
             ],
         ];
     }
