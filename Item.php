@@ -13,6 +13,7 @@ use yii\base\Model;
 /**
  * Item represents particular content item.
  * It consists of several content parts determined by [[contents]].
+ * This class is a descendant of [[Model]], which uses content parts as model attributes.
  *
  * @property Manager $manager related content manager reference.
  * @property string $id this item ID.

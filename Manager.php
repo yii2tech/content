@@ -13,7 +13,38 @@ use yii\base\InvalidParamException;
 use yii\di\Instance;
 
 /**
- * Manager
+ * Manager is an application component, which provides high-level content management interface.
+ *
+ * Application configuration example:
+ *
+ * ```php
+ * return [
+ *     'components' => [
+ *         'pageContentManager' => [
+ *             'class' => 'yii2tech\content\Manager',
+ *             'sourceStorage' => [
+ *                 'class' => 'yii2tech\content\PhpStorage',
+ *                 'filePath' => '@app/data/pages',
+ *             ],
+ *             'overrideStorage' => [
+ *                 'class' => 'yii2tech\content\DbStorage',
+ *                 'table' => '{{%Page}}',
+ *                 'contentAttributes' => [
+ *                     'title',
+ *                     'body',
+ *                 ],
+ *             ],
+ *         ],
+ *     ],
+ *     // ...
+ * ];
+ * ```
+ *
+ * Usage example:
+ *
+ * ```php
+ * echo Yii::$app->pageContentManager->get('about')->render('body');
+ * ```
  *
  * @property RendererInterface|array|\Closure $renderer content renderer.
  * @property StorageInterface|array|\Closure $sourceStorage source content storage.

@@ -62,13 +62,13 @@ Application configuration example:
 ```php
 return [
     'components' => [
-        'contentManager' => [
+        'pageContentManager' => [
             'class' => 'yii2tech\content\Manager',
             'sourceStorage' => [
                 'class' => 'yii2tech\content\PhpStorage',
-                'filePath' => '@app/data/content',
+                'filePath' => '@app/data/pages',
             ],
-            'sourceStorage' => [
+            'overrideStorage' => [
                 'class' => 'yii2tech\content\DbStorage',
                 'table' => '{{%Page}}',
                 'contentAttributes' => [
@@ -87,7 +87,7 @@ Each record represented by separated file, like following:
 
 ```php
 <?php
-// file '@app/data/content/about.php'
+// file '@app/data/pages/about.php'
 return [
     'title' => 'About',
     'body' => 'About page content',
@@ -132,7 +132,7 @@ use yii\bootstrap\Html;
 /* @var $this yii\web\View */
 /* @var $contentManager yii2tech\content\Manager */
 
-$contentManager = Yii::$app->get('contentManager');
+$contentManager = Yii::$app->get('pageContentManager');
 
 $this->title = $contentManager->get('about')->render('title');
 ?>
@@ -168,7 +168,7 @@ following:
 
 ```php
 <?php
-// file '@app/data/content/about.php'
+// file '@app/data/pages/about.php'
 return [
     'title' => 'About',
     'body' => <<<HTML
@@ -192,7 +192,7 @@ use yii\bootstrap\Html;
 /* @var $this yii\web\View */
 /* @var $contentManager yii2tech\content\Manager */
 
-$contentManager = Yii::$app->get('contentManager');
+$contentManager = Yii::$app->get('pageContentManager');
 
 $this->title = $contentManager->get('about')->render('title');
 ?>
@@ -220,7 +220,7 @@ so you do not need to pass them all the time:
 ```php
 return [
     'components' => [
-        'contentManager' => [
+        'pageContentManager' => [
             'class' => 'yii2tech\content\Manager',
             'defaultRenderData' => function () {
                 return [
@@ -236,11 +236,167 @@ return [
 ```
 
 
-## Email template management <span id="email-template-management"></span>
+## Overriding content <span id="overriding-content"></span>
+
+You may save content override using [[\yii2tech\content\Manager::save()]]. It will write the data into the
+'overrideStorage', keeping the one in 'sourceStorage' intact. For example:
+
+```php
+/* @var $contentManager yii2tech\content\Manager */
+$contentManager = Yii::$app->get('pageContentManager');
+
+$contentManager->save('about', [
+    'title' => 'Overridden Title',
+    'body' => 'Overridden Body',
+]);
+
+echo $contentManager->get('about')->render('title'); // outputs 'Overridden Title'
+```
+
+> Note: [[\yii2tech\content\Manager]] does NOT perform any check for content parts name matching
+  between source content and overridden one. It is your responsibility to maintain consistence between
+  source and overridden contents set. However, you can use [[\yii2tech\content\Item]] methods (see below)
+  to solve this task.
+
+You can use [[\yii2tech\content\Manager::reset()]] method in order to restore original (default) value
+for particular content set. For example:
+
+```php
+/* @var $contentManager yii2tech\content\Manager */
+$contentManager = Yii::$app->get('pageContentManager');
+
+$contentManager->reset('about');
+
+echo $contentManager->get('about')->render('title'); // outputs 'About'
+```
+
+You can perform same data manipulations using interface provided by [[\yii2tech\content\Item]].
+Each content part is accessible via its virtual property with the same name.
+For example:
+
+```php
+/* @var $contentManager yii2tech\content\Manager */
+$contentManager = Yii::$app->get('pageContentManager');
+
+$contentItem = $contentManager->get('about');
+$contentItem->title = 'Overridden Title';
+$contentItem->body = 'Overridden Body';
+$contentItem->save(); // saves override
+
+$contentItem->reset(); // restores origin (source)
+```
+
+Usage of [[\yii2tech\content\Item]] solves the problem of verification of matching source and override
+contents set.
+
+
+## Saving extra content <span id="saving-extra-content"></span>
+
+You can add a completely new contents set into 'override' storage even if it has no match in 'source' one.
+There is no direct restriction for that. For example:
+
+```php
+/* @var $contentManager yii2tech\content\Manager */
+$contentManager = Yii::$app->get('pageContentManager');
+
+$contentManager->save('newPage', [
+    'title' => 'New page',
+    'body' => 'New page body',
+]);
+
+echo $contentManager->get('newPage')->render('title'); // outputs 'New page'
+
+$contentManager->reset('newPage');
+
+$contentManager->get('newPage'); // throws an exception
+```
+
+This can also be performed using [[\yii2tech\content\Item]]. For example:
+
+```php
+use yii2tech\content\Item;
+
+/* @var $contentManager yii2tech\content\Manager */
+$contentManager = Yii::$app->get('pageContentManager');
+
+$contentItem = new Item([
+    'manager' => $contentManager,
+]);
+$contentItem->setId('newPage');
+$contentItem->setContents([
+    'title' => 'New page',
+    'body' => 'New page body',
+]);
+$contentItem->save();
+```
 
 
 ## Creating content management web interface <span id="creating-content-management-web-interface"></span>
 
+Class [[\yii2tech\content\Item]] is a descendant of [[\yii\base\Model]], which uses its content parts as the
+model attributes. Thus instance of [[\yii2tech\content\Item]] can be used for creating a web forms, populating
+from request data and saving.
+
 
 ## Working with meta data <span id="working-with-meta-data"></span>
 
+Working with content templates, you may want to setup some reference information about them, for example
+provide description for variables (placeholders) used inside the template. Such information may vary depending
+on particular content set, like variables for 'about' page may be different from the ones for 'how-it-works' page.
+Thus it is good practice to save such meta information along with the default content, e.g. in the source file.
+For example:
+
+```php
+<?php
+// file '@app/data/pages/about.php'
+return [
+    'title' => 'About {{appName}}',
+    'body' => 'About page content',
+    'pageUrl' => ['/site/about'],
+    'placeholderHints' => [
+        '{{appName}}' => 'Application name'
+    ],
+];
+```
+
+You can declare meta content parts list using [[\yii2tech\content\Manager::$metaDataContentParts]], for example:
+
+```php
+return [
+    'components' => [
+        'pageContentManager' => [
+            'class' => 'yii2tech\content\Manager',
+            'metaDataContentParts' => [
+                'pageUrl',
+                'placeholderHints',
+            ],
+            // ...
+        ],
+    ],
+    // ...
+];
+```
+
+Content parts listed at [[\yii2tech\content\Manager::$metaDataContentParts]] will not be returned by
+[[\yii2tech\content\Manager::get()]] or [[\yii2tech\content\Manager::getAll()]] methods and thus will not
+be populated inside [[\yii2tech\content\Item::$contents]]. You should use [[\yii2tech\content\Manager::getMetaData()]]
+or [[\yii2tech\content\Item::getMetaData()]] to retrieve them. For example:
+
+```php
+/* @var $contentManager yii2tech\content\Manager */
+$contentManager = Yii::$app->get('pageContentManager');
+
+$contentItem = $contentManager->get('about');
+var_dump($contentItem->has('pageUrl')); // outputs `false`
+
+$metaData = $contentManager->getMetaData('about');
+var_dump($metaData['pageUrl']);
+
+$metaData = $contentItem->getMetaData();
+var_dump($metaData['pageUrl']);
+```
+
+Meta data usage helps to compose user-friendly content management interface.
+
+
+## Email template management <span id="email-template-management"></span>
