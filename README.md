@@ -38,4 +38,4 @@ to the require section of your composer.json.
 Usage
 -----
 
-This extension
+This extension provides basic content management system for Yii2.

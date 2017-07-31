@@ -23,7 +23,7 @@ addons:
       - mongodb-org-shell
 
 # faster builds on new travis setup not using sudo
-sudo: true
+sudo: false
 
 # cache vendor dirs
 cache:
