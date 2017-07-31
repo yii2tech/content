@@ -27,6 +27,9 @@ use yii\di\Instance;
  * $this->createTable($tableName, $columns);
  * ```
  *
+ * > Note: make sure you are using appropriate DB types for the content fields, so they can contain enough data.
+ *   You may need to use such types as `MEDIUMTEXT` or `LARGETEXT` to store large content in database.
+ *
  * Configuration example:
  *
  * ```php

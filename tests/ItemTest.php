@@ -37,11 +37,11 @@ class ItemTest extends TestCase
         $storage = $manager->getSourceStorage();
         $storage->save('item1', [
             'title' => 'Item 1',
-            'body' => 'Item1 {name} body',
+            'body' => 'Item1 {{name}} body',
         ]);
         $storage->save('item2', [
             'title' => 'Item 2',
-            'body' => 'Item2 {name} body',
+            'body' => 'Item2 {{name}} body',
         ]);
     }
 
@@ -223,6 +223,6 @@ class ItemTest extends TestCase
 
         $this->assertFalse($item->has('body'));
 
-        $this->assertEquals(['body' => 'Item1 {name} body'], $item->getMetaData());
+        $this->assertEquals(['body' => 'Item1 {{name}} body'], $item->getMetaData());
     }
 }
