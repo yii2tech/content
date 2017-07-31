@@ -8,31 +8,26 @@
 namespace yii2tech\content;
 
 use yii\base\Component;
-use yii\db\Connection;
-use yii\db\Query;
 use yii\di\Instance;
+use yii\mongodb\Connection;
+use yii\mongodb\Query;
 
 /**
- * DbStorage represents the content storage based on database table.
- * Example migration for such table:
+ * MongoDbStorage represents the content storage based on MongoDB collection.
  *
- * ```php
- * $tableName = 'Page';
- * $columns = [
- *     'id' => 'string',
- *     'title' => 'string',
- *     'body' => 'text',
- *     'PRIMARY KEY(id)',
- * ];
- * $this->createTable($tableName, $columns);
+ * This storage requires [yiisoft/yii2-mongodb](https://github.com/yiisoft/yii2-mongodb) extension installed.
+ * This can be done via composer:
+ *
+ * ```
+ * composer require --prefer-dist yiisoft/yii2-mongodb
  * ```
  *
  * Configuration example:
  *
  * ```php
  * [
- *     'class' => 'yii2tech\content\DbStorage',
- *     'table' => '{{%Page}}',
+ *     'class' => 'yii2tech\content\MongoDbStorage',
+ *     'collection' => 'Content',
  *     'contentAttributes' => [
  *         'title',
  *         'body',
@@ -40,29 +35,32 @@ use yii\di\Instance;
  * ]
  * ```
  *
+ * The collection to be used can be changed by setting [[collection]].
+ * This collection is better to be pre-created with field [[idAttribute]] indexed.
+ *
  * @author Paul Klimov <klimov.paul@gmail.com>
  * @since 1.0
  */
-class DbStorage extends Component implements StorageInterface
+class MongoDbStorage extends Component implements StorageInterface
 {
     use StorageFilterTrait;
 
     /**
-     * @var Connection|array|string the DB connection object or the application component ID of the DB connection.
+     * @var Connection|array|string the MongoDB connection object or the application component ID of the MongoDB connection.
      * After the storage object is created, if you want to change this property, you should only assign it
-     * with a DB connection object.
+     * with a MongoDB connection object.
      */
-    public $db = 'db';
+    public $db = 'mongodb';
     /**
-     * @var string string name of the DB table to store content data.
+     * @var string|array name of the MongoDB collection, which should store account records.
      */
-    public $table;
+    public $collection;
     /**
-     * @var string name of the table column, which should store content ID.
+     * @var string name of the document column, which should store content ID.
      */
     public $idAttribute = 'id';
     /**
-     * @var string[] list of table columns, which should store content parts.
+     * @var string[] list of document columns, which should store content parts.
      */
     public $contentAttributes = [];
 
@@ -82,19 +80,15 @@ class DbStorage extends Component implements StorageInterface
     public function save($id, array $data)
     {
         $rowExists = (new Query())
-            ->from($this->table)
+            ->from($this->collection)
             ->andWhere($this->composeFilterAttributes([$this->idAttribute => $id]))
             ->exists($this->db);
 
         if ($rowExists) {
-            $this->db->createCommand()
-                ->update($this->table, $data, $this->composeFilterAttributes([$this->idAttribute => $id]))
-                ->execute();
+            $this->db->getCollection($this->collection)->update($this->composeFilterAttributes([$this->idAttribute => $id]), $data);
         } else {
             $data[$this->idAttribute] = $id;
-            $this->db->createCommand()
-                ->insert($this->table, $this->composeFilterAttributes($data))
-                ->execute();
+            $this->db->getCollection($this->collection)->insert($data);
         }
     }
 
@@ -104,8 +98,8 @@ class DbStorage extends Component implements StorageInterface
     public function find($id)
     {
         $row = (new Query())
-            ->select($this->contentAttributes)
-            ->from($this->table)
+            ->select(array_merge($this->contentAttributes, ['_id' => false]))
+            ->from($this->collection)
             ->andWhere($this->composeFilterAttributes([$this->idAttribute => $id]))
             ->one($this->db);
 
@@ -121,9 +115,8 @@ class DbStorage extends Component implements StorageInterface
     public function findAll()
     {
         $rows = (new Query())
-            ->select($this->idAttribute)
-            ->addSelect($this->contentAttributes)
-            ->from($this->table)
+            ->select(array_merge($this->contentAttributes, ['_id' => false], [$this->idAttribute => true]))
+            ->from($this->collection)
             ->andWhere($this->composeFilterAttributes())
             ->indexBy($this->idAttribute)
             ->all($this->db);
@@ -139,8 +132,6 @@ class DbStorage extends Component implements StorageInterface
      */
     public function delete($id)
     {
-        $this->db->createCommand()
-            ->delete($this->table, $this->composeFilterAttributes([$this->idAttribute => $id]))
-            ->execute();
+        $this->db->getCollection($this->collection)->remove($this->composeFilterAttributes([$this->idAttribute => $id]));
     }
 }
