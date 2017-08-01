@@ -56,6 +56,7 @@ class Manager extends Component
 {
     /**
      * @var array|\Closure configuration for the content item creation.
+     * @see Item
      */
     public $itemConfig = ['class' => 'yii2tech\content\Item'];
     /**

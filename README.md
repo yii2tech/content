@@ -337,7 +337,182 @@ $contentItem->save();
 
 Class [[\yii2tech\content\Item]] is a descendant of [[\yii\base\Model]], which uses its content parts as the
 model attributes. Thus instance of [[\yii2tech\content\Item]] can be used for creating a web forms, populating
-from request data and saving.
+from request data and saving. Thus controller, which performs content override may look like following:
+
+```php
+use yii\web\Controller;
+use yii\web\NotFoundHttpException;
+use yii2tech\content\ItemNotFoundException;
+use Yii;
+
+class PageController extends Controller
+{
+    /**
+     * Updates particular content item, creating/updating an override.
+     */
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+
+        if ($this->load($model, Yii::$app->request->post())) {
+            if ($model->save()) {
+                return $this->redirect(['index']);
+            }
+        }
+
+        return $this->render('update', [
+            'model' => $model,
+        ]);
+    }
+
+    /**
+     * Restores default values for particular content item, removing an override.
+     */
+    public function actionDefault($id)
+    {
+        $model = $this->findModel($id);
+        $model->reset();
+        return $this->redirect(['index']);
+    }
+
+    /**
+     * @param string $id
+     * @return \yii2tech\content\Item
+     */
+    protected function findModel($id)
+    {
+        /* @var $contentManager yii2tech\content\Manager */
+        $contentManager = Yii::$app->get('pageContentManager');
+        try {
+            $model = $contentManager->get($id);
+        } catch (ItemNotFoundException $e) {
+            throw new NotFoundHttpException('Requested page does not exist.');
+        }
+        return $model;
+    }
+
+    // ...
+}
+```
+
+The view file for 'update' action may look like following:
+
+```php
+<?php
+
+/* @var $this yii\web\View */
+/* @var $model yii2tech\content\Item */
+
+$this->title = Yii::t('admin', 'Update Page: ') . $model->id;
+<div class="row">
+    <?php $form = ActiveForm::begin(); ?>
+
+    <?= $form->field($model, 'title')->textInput() ?>
+
+    <?= $form->field($model, 'body')->textarea() ?>
+
+    <div class="form-group">
+        <?= Html::submitButton(Yii::t('admin', 'Save'), ['class' => 'btn btn-primary']) ?>
+    </div>
+
+    <?php ActiveForm::end(); ?>
+</div>
+```
+
+You may setup your own validation rules, attribute labels and hints for the [[\yii2tech\content\Item]] model using
+[[\yii2tech\content\Manager::$itemConfig]]. For example:
+
+```php
+return [
+    'components' => [
+        'pageContentManager' => [
+            'class' => 'yii2tech\content\Manager',
+            'itemConfig' => [
+                'class' => 'yii2tech\content\Item',
+                'rules' => [
+                    [['title', 'body'], 'required'],
+                    ['title', 'string', 'max' => 255],
+                ],
+                'labels' => function () {
+                    return [
+                        'title' => Yii::t('page', 'Title'),
+                        'body' => Yii::t('page', 'Body'),
+                    ];
+                },
+                'hints' => function () {
+                    return [
+                        'title' => Yii::t('page', 'Page title...'),
+                        'body' => Yii::t('page', 'Page body content...'),
+                    ];
+                },
+            ],
+            // ...
+        ],
+    ],
+    // ...
+];
+```
+
+> Note: by default if [[\yii2tech\content\Item::$rules]] are not specified - the 'required' validator will be set
+  for all attributes.
+
+You may also use your own class for the content item, specifying attribute validation rules, labels and hints in ordinary way.
+
+In order to get full list of content items available at particular manager [[\yii2tech\content\Manager::getAll()]] method
+can be used. So controller action, which lists all available pages may look like following:
+
+```php
+use yii\web\Controller;
+use Yii;
+
+class PageController extends Controller
+{
+    /**
+     * Displays list of all available content items.
+     */
+    public function actionIndex()
+    {
+        /* @var $contentManager yii2tech\content\Manager */
+        $contentManager = Yii::$app->get('pageContentManager');
+
+        $dataProvider = new ArrayDataProvider([
+            'allModels' => $contentManager->getAll(),
+            'pagination' => false,
+        ]);
+
+        return $this->render('index', [
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    // ...
+}
+```
+
+Then the view for the listing may look like following:
+
+```php
+<?php
+
+use yii\grid\ActionColumn;
+use yii\grid\GridView;
+
+/* @var $this yii\web\View */
+/* @var $dataProvider yii\data\ArrayDataProvider */
+?>
+<?= GridView::widget([
+    'dataProvider' => $dataProvider,
+    'columns' => [
+        'id',
+        'title',
+        'body',
+        [
+            'class' => ActionColumn::className(),
+            'template' => '{update} {default}',
+        ],
+    ]
+]); ?>
+```
 
 
 ## Working with meta data <span id="working-with-meta-data"></span>
