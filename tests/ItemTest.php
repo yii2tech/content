@@ -127,6 +127,48 @@ class ItemTest extends TestCase
     }
 
     /**
+     * @depends testValidate
+     */
+    public function testValidateCustomRules()
+    {
+        $item = new Item();
+        $item->setContents([
+            'email' => '',
+        ]);
+        $item->rules = [
+            ['email', 'email']
+        ];
+
+        $item->email = 'some-string';
+        $this->assertFalse($item->validate());
+
+        $item->email = 'user@example.com';
+        $this->assertTrue($item->validate());
+    }
+
+    /**
+     * @depends testValidateCustomRules
+     */
+    public function testValidateCustomRulesCallback()
+    {
+        $item = new Item();
+        $item->setContents([
+            'email' => '',
+        ]);
+        $item->rules = function () {
+            return [
+                ['email', 'email']
+            ];
+        };
+
+        $item->email = 'some-string';
+        $this->assertFalse($item->validate());
+
+        $item->email = 'user@example.com';
+        $this->assertTrue($item->validate());
+    }
+
+    /**
      * @depends testSetupContents
      */
     public function testRender()
@@ -224,5 +266,88 @@ class ItemTest extends TestCase
         $this->assertFalse($item->has('body'));
 
         $this->assertEquals(['body' => 'Item1 {{name}} body'], $item->getMetaData());
+    }
+
+    /**
+     * @depends testAttributes
+     */
+    public function testLabels()
+    {
+        $item = new Item();
+        $item->setContents([
+            'title' => '',
+            'body' => '',
+        ]);
+        $this->assertEquals('ID', $item->getAttributeLabel('id'));
+
+        $item->labels = [
+            'title' => 'Title Label',
+            'body' => 'Body Label',
+        ];
+        $this->assertEquals('Title Label', $item->getAttributeLabel('title'));
+        $this->assertEquals('Body Label', $item->getAttributeLabel('body'));
+        $this->assertEquals('ID', $item->getAttributeLabel('id'));
+    }
+
+    /**
+     * @depends testLabels
+     */
+    public function testLabelsCallback()
+    {
+        $item = new Item();
+        $item->setContents([
+            'title' => '',
+            'body' => '',
+        ]);
+
+        $item->labels = function () {
+            return [
+                'title' => 'Title Label',
+                'body' => 'Body Label',
+            ];
+        };
+        $this->assertEquals('Title Label', $item->getAttributeLabel('title'));
+        $this->assertEquals('Body Label', $item->getAttributeLabel('body'));
+        $this->assertEquals('ID', $item->getAttributeLabel('id'));
+    }
+
+    /**
+     * @depends testAttributes
+     */
+    public function testHints()
+    {
+        $item = new Item();
+        $item->setContents([
+            'title' => '',
+            'body' => '',
+        ]);
+
+        $item->hints = [
+            'title' => 'Title Hint',
+            'body' => 'Body Hint',
+        ];
+        $this->assertEquals('Title Hint', $item->getAttributeHint('title'));
+        $this->assertEquals('Body Hint', $item->getAttributeHint('body'));
+    }
+
+    /**
+     * @depends testHints
+     */
+    public function testHintsCallback()
+    {
+        $item = new Item();
+        $item->setContents([
+            'title' => '',
+            'body' => '',
+        ]);
+
+        $item->hints = function () {
+            return [
+                'title' => 'Title Hint',
+                'body' => 'Body Hint',
+            ];
+        };
+        $this->assertEquals('Title Hint', $item->getAttributeHint('title'));
+        $this->assertEquals('Body Hint', $item->getAttributeHint('body'));
     }
 }

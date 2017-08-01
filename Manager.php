@@ -248,8 +248,8 @@ class Manager extends Component
     {
         /* @var $item Item */
         $item = Yii::createObject($this->itemConfig);
-        $item->setManager($this);
-        $item->setId($id);
+        $item->manager = $this;
+        $item->id = $id;
 
         foreach ($this->metaDataContentParts as $contentPartName) {
             if (isset($contents[$contentPartName])) {

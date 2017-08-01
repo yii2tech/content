@@ -133,11 +133,12 @@ use yii\bootstrap\Html;
 /* @var $contentManager yii2tech\content\Manager */
 
 $contentManager = Yii::$app->get('pageContentManager');
+$contentItem = $contentManager->get('about');
 
-$this->title = $contentManager->get('about')->render('title');
+$this->title = $contentItem->render('title');
 ?>
 <div class="site-about">
-    <?= $contentManager->get('about')->render('body') ?>
+    <?= $contentItem->render('body') ?>
 </div>
 ```
 
@@ -193,11 +194,12 @@ use yii\bootstrap\Html;
 /* @var $contentManager yii2tech\content\Manager */
 
 $contentManager = Yii::$app->get('pageContentManager');
+$contentItem = $contentManager->get('about');
 
-$this->title = $contentManager->get('about')->render('title');
+$this->title = $contentItem->render('title');
 ?>
 <div class="site-about">
-    <?= $contentManager->get('about')->render('body', [
+    <?= $contentItem->render('body', [
         'appBaseUrl' => Yii::$app->request->baseUrl
     ]) ?>
 </div>
@@ -322,7 +324,7 @@ $contentManager = Yii::$app->get('pageContentManager');
 $contentItem = new Item([
     'manager' => $contentManager,
 ]);
-$contentItem->setId('newPage');
+$contentItem->id = 'newPage';
 $contentItem->setContents([
     'title' => 'New page',
     'body' => 'New page body',
@@ -396,7 +398,7 @@ $metaData = $contentItem->getMetaData();
 var_dump($metaData['pageUrl']);
 ```
 
-Meta data usage helps to compose user-friendly content management interface.
+Meta data usage helps in composition of user-friendly content management interface.
 
 
 ## Email template management <span id="email-template-management"></span>

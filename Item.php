@@ -15,8 +15,6 @@ use yii\base\Model;
  * It consists of several content parts determined by [[contents]].
  * This class is a descendant of [[Model]], which uses content parts as model attributes.
  *
- * @property Manager $manager related content manager reference.
- * @property string $id this item ID.
  * @property array $contents content parts in format: `[id => content]`.
  * @property array $metaData  meta data associated with this item.
  *
@@ -28,11 +26,55 @@ class Item extends Model
     /**
      * @var Manager related content manager reference.
      */
-    private $_manager;
+    public $manager;
     /**
      * @var string this item ID.
      */
-    private $_id;
+    public $id;
+    /**
+     * @var array|\Closure validation rules in format matching return type of [[rules()]].
+     * It could be also specified as a PHP callback, which should return actual validation rules.
+     * For example:
+     *
+     * ```php
+     * function (\yii2tech\content\Item $model) {
+     *     //return [...];
+     * }
+     * ```
+     *
+     * In case not set - default validation rules will be generated making all attributes to be 'required'.
+     * @see rules()
+     */
+    public $rules;
+    /**
+     * @var array|\Closure attribute labels in format matching return type of [[attributeLabels()]].
+     * It could be also specified as a PHP callback, which should return actual attribute labels.
+     * For example:
+     *
+     * ```php
+     * function (\yii2tech\content\Item $model) {
+     *     //return [...];
+     * }
+     * ```
+     *
+     * @see attributeLabels()
+     */
+    public $labels;
+    /**
+     * @var array|\Closure attribute hints in format matching return type of [[attributeHints()]].
+     * It could be also specified as a PHP callback, which should return actual attribute hints.
+     * For example:
+     *
+     * ```php
+     * function (\yii2tech\content\Item $model) {
+     *     //return [...];
+     * }
+     * ```
+     *
+     * @see attributeHints()
+     */
+    public $hints;
+
     /**
      * @var array related contents in format: `[id => content]`.
      */
@@ -42,38 +84,6 @@ class Item extends Model
      */
     private $_metaData;
 
-
-    /**
-     * @return Manager related content manager reference.
-     */
-    public function getManager()
-    {
-        return $this->_manager;
-    }
-
-    /**
-     * @param Manager $manager related content manager reference.
-     */
-    public function setManager($manager)
-    {
-        $this->_manager = $manager;
-    }
-
-    /**
-     * @return string this item ID
-     */
-    public function getId()
-    {
-        return $this->_id;
-    }
-
-    /**
-     * @param string $id this item ID
-     */
-    public function setId($id)
-    {
-        $this->_id = $id;
-    }
 
     /**
      * @return array contents in format: `[id => content]`.
@@ -97,7 +107,7 @@ class Item extends Model
     public function getMetaData()
     {
         if ($this->_metaData === null) {
-            $this->_metaData = $this->getManager()->getMetaData($this->getId());
+            $this->_metaData = $this->manager->getMetaData($this->id);
         }
         return $this->_metaData;
     }
@@ -139,7 +149,7 @@ class Item extends Model
      */
     public function render($id, array $data = [])
     {
-        $manager = $this->getManager();
+        $manager = $this->manager;
         if (!empty($manager->defaultRenderData)) {
             $data = array_merge(
                 $manager->defaultRenderData instanceof \Closure ? call_user_func($manager->defaultRenderData) : $manager->defaultRenderData,
@@ -160,7 +170,7 @@ class Item extends Model
         if ($runValidation && !$this->validate()) {
             return false;
         }
-        $this->getManager()->save($this->getId(), $this->getContents());
+        $this->manager->save($this->id, $this->getContents());
         return true;
     }
 
@@ -170,9 +180,9 @@ class Item extends Model
      */
     public function reset($refresh = true)
     {
-        $this->getManager()->reset($this->getId());
+        $this->manager->reset($this->id);
         if ($refresh) {
-            $refreshItem = $this->getManager()->get($this->getId());
+            $refreshItem = $this->manager->get($this->id);
             $this->setContents($refreshItem->getContents());
         }
     }
@@ -184,10 +194,11 @@ class Item extends Model
      */
     public function attributes()
     {
-        return array_merge(
+        $attributes = array_merge(
             parent::attributes(),
             array_keys($this->_contents)
         );
+        return array_values(array_diff($attributes, ['id', 'manager', 'rules', 'labels', 'hints']));
     }
 
     /**
@@ -195,9 +206,46 @@ class Item extends Model
      */
     public function rules()
     {
-        return [
-            [$this->attributes(), 'required'],
+        if (empty($this->rules)) {
+            return [
+                [$this->attributes(), 'required'],
+            ];
+        }
+        if ($this->rules instanceof \Closure) {
+            return call_user_func($this->rules, $this);
+        }
+        return $this->rules;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        $labels = [
+            'id' => 'ID'
         ];
+        if (empty($this->labels)) {
+            return $labels;
+        }
+        if ($this->labels instanceof \Closure) {
+            return array_merge($labels, call_user_func($this->labels, $this));
+        }
+        return array_merge($labels, $this->labels);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function attributeHints()
+    {
+        if (empty($this->hints)) {
+            return [];
+        }
+        if ($this->hints instanceof \Closure) {
+            return call_user_func($this->hints, $this);
+        }
+        return $this->hints;
     }
 
     // Magic property access :

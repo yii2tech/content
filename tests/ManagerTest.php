@@ -91,8 +91,8 @@ class ManagerTest extends TestCase
 
         $item = $manager->get('item1');
         $this->assertTrue($item instanceof Item);
-        $this->assertEquals('item1', $item->getId());
-        $this->assertSame($manager, $item->getManager());
+        $this->assertEquals('item1', $item->id);
+        $this->assertSame($manager, $item->manager);
         $this->assertEquals('Item 1', $item->get('title'));
         $this->assertEquals('Item 1 Body', $item->get('body'));
 
