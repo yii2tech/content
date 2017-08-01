@@ -68,6 +68,7 @@ class ActiveRecordStorage extends Component implements StorageInterface
             $model->{$attribute} = $value;
         }
         $model->save(false);
+        $this->ensureModelGc($model);
     }
 
     /**
@@ -76,12 +77,12 @@ class ActiveRecordStorage extends Component implements StorageInterface
     public function find($id)
     {
         $model = $this->findModel($id);
-
         if ($model === null) {
             return null;
         }
-
-        return $this->extractModelContents($model);
+        $contents = $this->extractModelContents($model);
+        $this->ensureModelGc($model);
+        return $contents;
     }
 
     /**
@@ -98,6 +99,7 @@ class ActiveRecordStorage extends Component implements StorageInterface
         $rows = [];
         foreach ($models as $model) {
             $rows[$model->{$this->idAttribute}] = $this->extractModelContents($model);
+            $this->ensureModelGc($model);
         }
         return $rows;
     }
@@ -110,6 +112,7 @@ class ActiveRecordStorage extends Component implements StorageInterface
         $model = $this->findModel($id);
         if ($model !== null) {
             $model->delete();
+            $this->ensureModelGc($model);
         }
     }
 
@@ -139,5 +142,16 @@ class ActiveRecordStorage extends Component implements StorageInterface
             $contents[$attribute] = $model->{$attribute};
         }
         return $contents;
+    }
+
+    /**
+     * Ensures model garbage collection, attempting to remove cycle references produced by behaviors.
+     * @param \yii\db\ActiveRecordInterface|Component $model model instance.
+     */
+    protected function ensureModelGc($model)
+    {
+        if ($model instanceof Component) {
+            $model->detachBehaviors();
+        }
     }
 }
