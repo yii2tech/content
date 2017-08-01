@@ -514,6 +514,10 @@ use yii\grid\GridView;
 ]); ?>
 ```
 
+**Heads up!** While using [[\yii2tech\content\Manager::getAll()]] provides a quick simple way for content listing building,
+it is not efficient regardless to the computing resources and memory consumption. While using it the program may reach
+PHP memory limit in case you have many content items with large data associated.
+
 
 ## Working with meta data <span id="working-with-meta-data"></span>
 
@@ -577,3 +581,79 @@ Meta data usage helps in composition of user-friendly content management interfa
 
 
 ## Email template management <span id="email-template-management"></span>
+
+Do not limit yourself with 'pages' example. This extension may be used for several purposes, including email template
+management. Application configuration example:
+
+```php
+return [
+    'components' => [
+        'mailContentManager' => [
+            'class' => 'yii2tech\content\Manager',
+            'sourceStorage' => [
+                'class' => 'yii2tech\content\PhpStorage',
+                'filePath' => '@app/data/mail',
+            ],
+            'overrideStorage' => [
+                'class' => 'yii2tech\content\DbStorage',
+                'table' => '{{%MailTemplate}}',
+                'contentAttributes' => [
+                    'subject',
+                    'body',
+                ],
+            ],
+        ],
+    ],
+    // ...
+];
+```
+
+Email message composition example:
+
+```php
+/* @var $contentManager yii2tech\content\Manager */
+$contentManager = Yii::$app->get('mailContentManager');
+$contentItem = $contentManager->get('contact');
+
+Yii::$app->mailer->compose()
+    ->setTo($admin->email)
+    ->setFrom([Yii::$app->params['appEmail'] => Yii::$app->name])
+    ->setSubject($contentItem->render('subject', ['appName' => Yii::$app->name, 'form' => $this]))
+    ->setHtmlBody($contentItem->render('body', ['appName' => Yii::$app->name, 'form' => $this]))
+    ->send();
+```
+
+
+## Internationalization <span id="internationalization"></span>
+
+In case you have a multi-lingual project and its content should vary depending on chose interface language, the best way
+to handle it will be usage of composite content IDs. Such ID should include actual language as its part. For example:
+instead of using 'about', you should operate 'en/about', 'ru/about' and so on. File-based storages like [[yii2tech\content\PhpStorage]]
+and [[yii2tech\content\JsonStorage]] are able to operate sub-folders. So the source files structure will look like following:
+
+```
+data/
+    pages/
+        en/
+            about.php
+            how-it-works.php
+        ru/
+            about.php
+            how-it-works.php
+    mail/
+        en/
+            contact.php
+            reset-password.php
+        ru/
+            contact.php
+            reset-password.php
+```
+
+While retrieving the particular content item, its ID should be composed using [[\yii\base\Application::$language]].
+For example:
+
+```php
+/* @var $contentManager yii2tech\content\Manager */
+$contentManager = Yii::$app->get('pageContentManager');
+$contentItem = $contentManager->get(Yii::$app->language . '/about');
+```

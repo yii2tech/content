@@ -19,7 +19,7 @@ use yii\base\Component;
  * echo $renderer->render('Hello, <?= $name ?>', ['name' => 'John']); // outputs 'Hell, John'
  * ```
  *
- * > Note: while using PHP evaluation provides greatest flexibility for content template composition,
+ * > Caution: while using PHP evaluation provides greatest flexibility for content template composition,
  * it is not recommended to be used as it produces security risks, allowing  execution of arbitrary PHP code.
  *
  * @see eval()
