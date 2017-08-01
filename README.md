@@ -106,7 +106,7 @@ class m??????_??????_createPage extends yii\db\Migration
             'id' => $this->string(),
             'title' => $this->string(),
             'body' => $this->text(),
-            'PRIMARY KEY(id)',
+            'PRIMARY KEY([[id]])',
         ];
         $this->createTable($tableName, $columns);
     }
@@ -354,7 +354,7 @@ class PageController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($this->load($model, Yii::$app->request->post())) {
+        if ($model->load(Yii::$app->request->post())) {
             if ($model->save()) {
                 return $this->redirect(['index']);
             }
@@ -381,7 +381,7 @@ class PageController extends Controller
      */
     protected function findModel($id)
     {
-        /* @var $contentManager yii2tech\content\Manager */
+        /* @var $contentManager \yii2tech\content\Manager */
         $contentManager = Yii::$app->get('pageContentManager');
         try {
             $model = $contentManager->get($id);
@@ -400,10 +400,14 @@ The view file for 'update' action may look like following:
 ```php
 <?php
 
+use yii\widgets\ActiveForm;
+use yii\helpers\Html;
+
 /* @var $this yii\web\View */
 /* @var $model yii2tech\content\Item */
 
 $this->title = Yii::t('admin', 'Update Page: ') . $model->id;
+?>
 <div class="row">
     <?php $form = ActiveForm::begin(); ?>
 
@@ -472,7 +476,7 @@ class PageController extends Controller
      */
     public function actionIndex()
     {
-        /* @var $contentManager yii2tech\content\Manager */
+        /* @var $contentManager \yii2tech\content\Manager */
         $contentManager = Yii::$app->get('pageContentManager');
 
         $dataProvider = new ArrayDataProvider([
@@ -509,6 +513,12 @@ use yii\grid\GridView;
         [
             'class' => ActionColumn::className(),
             'template' => '{update} {default}',
+            'buttons' => [
+                'default' => function ($url) {
+                    $icon = Html::tag('span', '', ['class' => "glyphicon glyphicon-repeat"]);
+                    return Html::a($icon, $url, ['title' => 'Default', 'data-confirm' => 'Are you sure you want to restore defaults for this item?']);
+                },
+            ],
         ],
     ]
 ]); ?>
