@@ -9,7 +9,6 @@ namespace yii2tech\content;
 
 use Yii;
 use yii\base\Component;
-use yii\base\InvalidParamException;
 use yii\di\Instance;
 
 /**
@@ -168,6 +167,7 @@ class Manager extends Component
      * Returns content Item matching given ID.
      * @param string $id content item ID.
      * @return Item content item instance.
+     * @throws ItemNotFoundException if item not found.
      */
     public function get($id)
     {
@@ -175,7 +175,7 @@ class Manager extends Component
         if ($data === null) {
             $data = $this->getSourceStorage()->find($id);
             if ($data === null) {
-                throw new InvalidParamException("Content item '{$id}' does not exist.");
+                throw new ItemNotFoundException("Content item '{$id}' does not exist.");
             }
         }
         return $this->createItem($id, $data);

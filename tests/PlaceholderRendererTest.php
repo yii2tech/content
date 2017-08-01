@@ -21,6 +21,13 @@ class PlaceholderRendererTest extends TestCase
                 'Some foo content',
             ],
             [
+                'CamelCase {{camelCase}} content',
+                [
+                    'camelCase' => 'foo',
+                ],
+                'CamelCase foo content',
+            ],
+            [
                 'Underscore {{underscore_name}} content',
                 [
                     'underscore_name' => 'foo',
@@ -35,6 +42,20 @@ class PlaceholderRendererTest extends TestCase
                     ],
                 ],
                 'Multi-level John content',
+            ],
+            [
+                'Un existing {{unExisting}} content',
+                [
+                    'name' => 'foo',
+                ],
+                'Un existing {{unExisting}} content',
+            ],
+            [
+                'Multi-level un existing {{person.name}} content',
+                [
+                    'name' => 'foo',
+                ],
+                'Multi-level un existing {{person.name}} content',
             ],
         ];
     }

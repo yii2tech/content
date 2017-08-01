@@ -55,7 +55,7 @@ class PlaceholderRenderer extends Component implements RendererInterface
 
             if (strpos($placeholderName, '.') !== false) {
                 $placeholderNameParts = explode('.', $placeholderName);
-                return ArrayHelper::getValue($data, $placeholderNameParts, $placeholderName);
+                return ArrayHelper::getValue($data, $placeholderNameParts, $matches[0]);
             }
 
             if (isset($data[$placeholderName])) {

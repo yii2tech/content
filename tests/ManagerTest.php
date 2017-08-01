@@ -96,7 +96,7 @@ class ManagerTest extends TestCase
         $this->assertEquals('Item 1', $item->get('title'));
         $this->assertEquals('Item 1 Body', $item->get('body'));
 
-        $this->expectException('yii\base\InvalidParamException');
+        $this->expectException('yii2tech\content\ItemNotFoundException');
         $manager->get('un-existing');
     }
 

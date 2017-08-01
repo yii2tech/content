@@ -308,7 +308,7 @@ echo $contentManager->get('newPage')->render('title'); // outputs 'New page'
 
 $contentManager->reset('newPage');
 
-$contentManager->get('newPage'); // throws an exception
+$contentManager->get('newPage'); // throws `\yii2tech\content\ItemNotFoundException` exception
 ```
 
 This can also be performed using [[\yii2tech\content\Item]]. For example:
