@@ -40,8 +40,8 @@ Usage
 
 This extension provides basic content management system for Yii2.
 There is a common task to provide ability for application administrator to change site content, like static
-pages ('About us', 'How it works' and so one), email templates and so on. This task is usually solved be developer
-using a dedicated database entities (tables) to store static page or email templates contents. However using just
+pages ('About us', 'How it works' and so on), email templates and so on. This task is usually solved be developer
+using a dedicated database entities (tables) to store static page or email template contents. However using just
 database entities creates a several problems like defining default (pre-filled) data or updating existing application.
 In case you need to setup a default pre-set for static pages, so the deployed application does not look empty or
 add extra static page to the existing site with pre-filled content, you'll need to manipulate database records using
@@ -181,8 +181,8 @@ HTML
 ];
 ```
 
-While displaying the content to can pass render parameters to [[\yii2tech\content\Item::render()]] in the same way
-as regular view rendering:
+While displaying the content you can pass render parameters to [[\yii2tech\content\Item::render()]] in the same way
+as for regular view rendering:
 
 ```php
 <?php
@@ -457,13 +457,13 @@ return [
 ];
 ```
 
-> Note: by default if [[\yii2tech\content\Item::$rules]] are not specified - the 'required' validator will be set
+> Note: by default, if [[\yii2tech\content\Item::$rules]] are not specified - the 'required' validator will be set
   for all attributes.
 
 You may also use your own class for the content item, specifying attribute validation rules, labels and hints in ordinary way.
 
 In order to get full list of content items available at particular manager [[\yii2tech\content\Manager::getAll()]] method
-can be used. So controller action, which lists all available pages may look like following:
+can be used. So controller action, which lists all available pages, may look like following:
 
 ```php
 use yii\web\Controller;
@@ -515,7 +515,7 @@ use yii\grid\GridView;
             'template' => '{update} {default}',
             'buttons' => [
                 'default' => function ($url) {
-                    $icon = Html::tag('span', '', ['class' => "glyphicon glyphicon-repeat"]);
+                    $icon = Html::tag('span', '', ['class' => 'glyphicon glyphicon-repeat']);
                     return Html::a($icon, $url, ['title' => 'Default', 'data-confirm' => 'Are you sure you want to restore defaults for this item?']);
                 },
             ],
@@ -636,10 +636,10 @@ Yii::$app->mailer->compose()
 
 ## Internationalization <span id="internationalization"></span>
 
-In case you have a multi-lingual project and its content should vary depending on chose interface language, the best way
+In case you have a multi-lingual project and its content should vary depending on chosen interface language, the best way
 to handle it will be usage of composite content IDs. Such ID should include actual language as its part. For example:
-instead of using 'about', you should operate 'en/about', 'ru/about' and so on. File-based storages like [[yii2tech\content\PhpStorage]]
-and [[yii2tech\content\JsonStorage]] are able to operate sub-folders. So the source files structure will look like following:
+instead of using 'about', you should operate 'en/about', 'ru/about' and so on. File-based storages like [[\yii2tech\content\PhpStorage]]
+and [[\yii2tech\content\JsonStorage]] are able to operate sub-folders. So the source files structure will look like following:
 
 ```
 data/
