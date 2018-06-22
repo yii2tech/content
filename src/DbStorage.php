@@ -134,6 +134,7 @@ class DbStorage extends Component implements StorageInterface
         foreach ($rows as &$row) {
             unset($row[$this->idAttribute]);
         }
+
         return $rows;
     }
 

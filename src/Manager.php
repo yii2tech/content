@@ -34,6 +34,7 @@ use yii\di\Instance;
  *                 ],
  *             ],
  *         ],
+ *         // ...
  *     ],
  *     // ...
  * ];
@@ -179,6 +180,7 @@ class Manager extends Component
                 throw new ItemNotFoundException("Content item '{$id}' does not exist.");
             }
         }
+
         return $this->createItem($id, $data);
     }
 
@@ -192,10 +194,12 @@ class Manager extends Component
             $this->getSourceStorage()->findAll(),
             $this->getOverrideStorage()->findAll()
         );
+
         $items = [];
         foreach ($rows as $id => $data) {
             $items[$id] = $this->createItem($id, $data);
         }
+
         return $items;
     }
 

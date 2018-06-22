@@ -121,6 +121,7 @@ class Item extends Model
     }
 
     /**
+     * Returns value of the specified content part.
      * @param string $id content part ID.
      * @return string content.
      */
@@ -133,6 +134,7 @@ class Item extends Model
     }
 
     /**
+     * Checks whether this item has particular content part.
      * @param string $id content part ID.
      * @return bool whether content part exists or not.
      */

@@ -40,7 +40,7 @@ Usage
 
 This extension provides basic content management system for Yii2.
 There is a common task to provide ability for application administrator to change site content, like static
-pages ('About us', 'How it works' and so on), email templates and so on. This task is usually solved be developer
+pages ('About us', 'How it works' and so on), email templates and so on. This task is usually solved by developer
 using a dedicated database entities (tables) to store static page or email template contents. However using just
 database entities creates a several problems like defining default (pre-filled) data or updating existing application.
 In case you need to setup a default pre-set for static pages, so the deployed application does not look empty or
@@ -83,7 +83,7 @@ return [
 ```
 
 In this example default contents for the static pages located in the project files under directory '@app/data/content'.
-Each record represented by separated file, like following:
+Each record is represented by the separated file, like following:
 
 ```php
 <?php
@@ -163,7 +163,7 @@ Please refer to the particular storage class for more details.
 ## Template rendering <span id="template-rendering"></span>
 
 Storing just a final HTML content usually is not enough. For the most cases content management operates by content
-templates, which will be populated by particular data at runtime. For example you may want to use application base
+templates, which will be populated by particular data at runtime. For example: you may want to use application base
 URL inside the 'About' page content, allowing to refer images and create links. Thus default content will look like
 following:
 
@@ -181,7 +181,7 @@ HTML
 ];
 ```
 
-While displaying the content you can pass render parameters to [[\yii2tech\content\Item::render()]] in the same way
+While displaying the content, you can pass render parameters to [[\yii2tech\content\Item::render()]] in the same way
 as for regular view rendering:
 
 ```php
@@ -294,7 +294,7 @@ contents set.
 
 ## Saving extra content <span id="saving-extra-content"></span>
 
-You can add a completely new contents set into 'override' storage even if it has no match in 'source' one.
+You can add a completely new contents set into 'override' storage, even if it has no match in 'source' one.
 There is no direct restriction for that. For example:
 
 ```php
@@ -525,7 +525,7 @@ use yii\grid\GridView;
 ```
 
 **Heads up!** While using [[\yii2tech\content\Manager::getAll()]] provides a quick simple way for content listing building,
-it is not efficient regardless to the computing resources and memory consumption. While using it the program may reach
+it is not efficient regardless to the computing resources and memory consumption. While using it, the program may reach
 PHP memory limit in case you have many content items with large data associated.
 
 
@@ -636,7 +636,7 @@ Yii::$app->mailer->compose()
 
 ## Internationalization <span id="internationalization"></span>
 
-In case you have a multi-lingual project and its content should vary depending on chosen interface language, the best way
+In case you have a multi-lingual project and its content should vary depending on chosen interface language. The best way
 to handle it will be usage of composite content IDs. Such ID should include actual language as its part. For example:
 instead of using 'about', you should operate 'en/about', 'ru/about' and so on. File-based storages like [[\yii2tech\content\PhpStorage]]
 and [[\yii2tech\content\JsonStorage]] are able to operate sub-folders. So the source files structure will look like following:

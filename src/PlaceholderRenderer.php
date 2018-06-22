@@ -61,6 +61,7 @@ class PlaceholderRenderer extends Component implements RendererInterface
             if (isset($data[$placeholderName])) {
                 return $data[$placeholderName];
             }
+
             return $matches[0];
         }, $content);
     }

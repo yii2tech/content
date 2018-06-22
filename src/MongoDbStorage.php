@@ -19,7 +19,7 @@ use yii\mongodb\Query;
  * This can be done via composer:
  *
  * ```
- * composer require --prefer-dist yiisoft/yii2-mongodb
+ * composer require --prefer-dist "yiisoft/yii2-mongodb:~2.1.0"
  * ```
  *
  * Configuration example:
@@ -106,6 +106,7 @@ class MongoDbStorage extends Component implements StorageInterface
         if ($row === false) {
             return null;
         }
+
         return $row;
     }
 
@@ -124,6 +125,7 @@ class MongoDbStorage extends Component implements StorageInterface
         foreach ($rows as &$row) {
             unset($row[$this->idAttribute]);
         }
+
         return $rows;
     }
 
