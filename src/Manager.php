@@ -228,13 +228,19 @@ class Manager extends Component
         if (empty($this->metaDataContentParts)) {
             return [];
         }
+
         $data = $this->getSourceStorage()->find($id);
+        if ($data === null) {
+            return [];
+        }
+
         $metaData = [];
         foreach ($data as $key => $value) {
             if (in_array($key, $this->metaDataContentParts, true)) {
                 $metaData[$key] = $value;
             }
         }
+
         return $metaData;
     }
 

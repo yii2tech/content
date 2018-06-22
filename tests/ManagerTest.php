@@ -170,5 +170,10 @@ class ManagerTest extends TestCase
         $this->assertFalse($items['item1']->has('body'));
 
         $this->assertEquals(['body' => 'Item 1 Body'], $manager->getMetaData('item1'));
+
+        $manager->save('new-item', [
+            'title' => 'new item'
+        ]);
+        $this->assertEquals([], $manager->getMetaData('new-item'));
     }
 }
