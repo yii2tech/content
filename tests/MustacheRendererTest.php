@@ -10,6 +10,18 @@ use yii2tech\content\MustacheRenderer;
 class MustacheRendererTest extends TestCase
 {
     /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        if (!class_exists('Mustache_Engine')) {
+            $this->markTestSkipped('"mustache/mustache" package required.');
+        }
+    }
+
+    /**
      * Data provider for [[testParse()]].
      * @return array test data.
      */

@@ -17,7 +17,7 @@
         }
     ],
     "require": {
-        "yiisoft/yii2": "*"
+        "yiisoft/yii2": "~2.0.14"
     },
     "suggest": {
         "mustache/mustache": "you need this package, if you wish to use `MustacheRenderer`"

@@ -7,7 +7,7 @@
 
 namespace yii2tech\content;
 
-use yii\base\InvalidParamException;
+use yii\base\InvalidArgumentException;
 
 /**
  * ItemNotFoundException represents an exception caused by content item not found.
@@ -15,7 +15,7 @@ use yii\base\InvalidParamException;
  * @author Paul Klimov <klimov.paul@gmail.com>
  * @since 1.0
  */
-class ItemNotFoundException extends InvalidParamException
+class ItemNotFoundException extends InvalidArgumentException
 {
     /**
      * @return string the user-friendly name of this exception

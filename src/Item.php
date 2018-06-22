@@ -7,7 +7,7 @@
 
 namespace yii2tech\content;
 
-use yii\base\InvalidParamException;
+use yii\base\InvalidArgumentException;
 use yii\base\Model;
 
 /**
@@ -127,7 +127,7 @@ class Item extends Model
     public function get($id)
     {
         if (!$this->has($id)) {
-            throw new InvalidParamException("Content part '{$id}' does not exist.");
+            throw new InvalidArgumentException("Content part '{$id}' does not exist.");
         }
         return $this->_contents[$id];
     }
@@ -255,7 +255,7 @@ class Item extends Model
      * This method is overridden so that content parts can be accessed like properties.
      *
      * @param string $name property name
-     * @throws \yii\base\InvalidParamException if relation name is wrong
+     * @throws \yii\base\InvalidArgumentException if relation name is wrong
      * @return mixed property value
      * @see getAttribute()
      */
