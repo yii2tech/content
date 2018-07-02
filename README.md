@@ -633,6 +633,41 @@ Yii::$app->mailer->compose()
     ->send();
 ```
 
+You may simplify this task using [[\yii2tech\content\mail\MailerContentBehavior]] behavior, which, being attached to the mailer
+component, provides a shortcut method `composeFromContent()` for quick mail message composition from the content item.
+Application configuration example:
+
+```php
+return [
+    'components' => [
+        'mailContentManager' => [
+            // ...
+        ],
+        'mailer' => [
+            'class' => 'yii\swiftmailer\Mailer',
+            'as content' => [
+                'class' => 'yii2tech\content\mail\MailerContentBehavior',
+                'contentManager' => 'mailContentManager',
+                'messagePopulationMap' => [
+                    'subject' => 'setSubject()',
+                    'body' => 'setHtmlBody()',
+                ],
+            ],
+        ],
+    ],
+    // ...
+];
+```
+
+Email message composition example:
+
+```php
+Yii::$app->mailer->composeFromContent('contact', ['appName' => Yii::$app->name, 'form' => $this])
+    ->setTo($admin->email)
+    ->setFrom([Yii::$app->params['appEmail'] => Yii::$app->name])
+    ->send();
+```
+
 
 ## Internationalization <span id="internationalization"></span>
 
