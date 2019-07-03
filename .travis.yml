@@ -1,3 +1,6 @@
+# use ubuntu trusty for old PHP versions
+dist: trusty
+
 language: php
 
 php:
@@ -6,6 +9,7 @@ php:
   - 7.0
   - 7.1
   - 7.2
+  - 7.3
 
 # run build against hhvm but allow them to fail
 # http://docs.travis-ci.com/user/build-configuration/#Rows-That-are-Allowed-To-Fail
@@ -38,6 +42,7 @@ install:
   - travis_retry composer install --prefer-dist --no-interaction
   - travis_retry composer require "mustache/mustache:~2.0" --prefer-dist --no-interaction
   - travis_retry composer require "yiisoft/yii2-mongodb:~2.1.0" --prefer-dist --no-interaction
+  - travis_retry composer require "phpunit/phpunit:4.8.27|^5.0|^6.0" --update-with-dependencies
 
 script:
-  - phpunit $PHPUNIT_FLAGS
+  - vendor/bin/phpunit $PHPUNIT_FLAGS
